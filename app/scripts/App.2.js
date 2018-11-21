@@ -5,8 +5,7 @@
 // TODO : add Stats
 
 let OrbitControls = require("three-orbit-controls")(THREE);
-import vertex from "./shaders/shader.vert";
-import fragment from "./shaders/shader.frag";
+import Geo from "./Geo"
 
 export default class App {
   constructor() {
@@ -23,7 +22,6 @@ export default class App {
     this.camera.position.z = 200;
     this.camera.position.y = 5;
 
-
     this.controls = new OrbitControls(this.camera);
     this.controls.enablePan = true;
     this.controls.enableZoom = true;
@@ -38,14 +36,16 @@ export default class App {
     this.scene = new THREE.Scene();
     this.vert = [];
 
-    this.width = 110;
-    this.height = 110;
+    this.width = 80;
+    this.height = 80;
     this.r = 3;
     this.k = 30; //quitTrial
     this.w = this.r / Math.sqrt(2);
     this.grid = [];
     this.active = [];
     this.ordered = [];
+    this.finalConvex = [];
+    this.geos = []
 
     // STEP 0
     this.cols = Math.floor(this.width / this.w);
@@ -63,34 +63,11 @@ export default class App {
     this.grid[i + j * this.cols] = pos;
     this.active.push(pos);
 
-    //same
-
-    let geometry = new THREE.BufferGeometry();
-    this.vert.push(0, 0, 0);
-    this.vert.push(0.5, 0.5, 0);
-    this.vert.push(0, 0.5, 0);
-
-    let vertices = new Float32Array(this.vert);
-    geometry.addAttribute("position", new THREE.BufferAttribute(vertices, 3));
-
-    this.indice = [];
-    for (let a = 1; a < this.vert.length / 3 - 1; a += 1) {
-      this.indice.push(0, a, a + 1);
-    }
-
-    geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(this.indice), 1));
-
-    let material = new THREE.ShaderMaterial({
-      uniforms: {
-        color: { value: new THREE.Color(0x00ff00) }
-      },
-      vertexShader: vertex,
-      fragmentShader: fragment
-    });
-    this.mesh = new THREE.Mesh(geometry, material);
-    this.scene.add(this.mesh);
-
-
+    
+    this.geos.push(new Geo())
+    this.geos.forEach(geo=>{
+      this.scene.add(geo.mesh);
+    })
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -108,14 +85,13 @@ export default class App {
 
     window.addEventListener("resize", this.onWindowResize.bind(this), false);
     this.onWindowResize();
-    this.triggerPoint()
-    this.triggerPoint()
-    this.triggerPoint()
+    this.triggerPoint();
+    this.triggerPoint();
+    this.triggerPoint();
     this.renderer.animate(this.render.bind(this));
-    
   }
 
-  triggerPoint(){
+  triggerPoint() {
     if (this.active.length > 0) {
       let activRandom = Math.floor(Math.random() * this.active.length);
       let posi = this.active[activRandom];
@@ -167,6 +143,11 @@ export default class App {
         this.active.splice(activRandom, 1);
       }
     }
+
+
+    this.geos.forEach(geo=>{
+      geo.update(this.ordered,[],this.geos)
+    })
   }
 
   render() {
@@ -174,29 +155,6 @@ export default class App {
 
     //this.triggerPoint()
 
-    this.mesh.geometry.attributes.position.array[0] = Math.sin(this.time) * 0.7;
-    this.mesh.geometry.attributes.position.needsUpdate = true;
-    //this.vert.push(0, 0, 0);
-    this.vert.splice(0,this.vert.length)
-    // console.log(this.vert);
-    // this.vert.push(1, 1, 0);
-    // this.vert.push(1.5, 1.5, 0);
-    // this.vert.push(1, 1.5, 0);
-
-   // this.mesh.geometry.verticesNeedUpdate = true
-    for (var i = 0; i < this.ordered.length; i++) {
-      if (this.ordered[i]) {
-        this.vert.push(this.ordered[i].x/2, this.ordered[i].y/2, 0);
-        this.spheres[i].position.x = this.ordered[i].x/2
-        this.spheres[i].position.y = this.ordered[i].y/2
-      }
-    }
-    for (let j = 1; j < this.vert.length / 3 - 1; j += 1) {
-      this.indice.push(0, j, j + 1);
-    }
-    this.mesh.geometry.addAttribute("position", new THREE.BufferAttribute(new Float32Array(this.vert), 3));
-    this.mesh.geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(this.indice), 1));
-    
     this.renderer.render(this.scene, this.camera);
   }
 
