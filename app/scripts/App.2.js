@@ -7,6 +7,7 @@
 let OrbitControls = require("three-orbit-controls")(THREE);
 import vertex from "./shaders/shader.vert";
 import fragment from "./shaders/shader.frag";
+
 export default class App {
   constructor() {
     this.time = 0;
@@ -19,7 +20,7 @@ export default class App {
       0.1,
       1000
     );
-    this.camera.position.z = 7;
+    this.camera.position.z = 200;
 
     this.controls = new OrbitControls(this.camera);
     this.controls.enablePan = true;
@@ -35,9 +36,9 @@ export default class App {
     this.scene = new THREE.Scene();
     this.vert = [];
 
-    this.width = 80;
-    this.height = 80;
-    this.r = 4;
+    this.width = 110;
+    this.height = 110;
+    this.r = 3;
     this.k = 30; //quitTrial
     this.w = this.r / Math.sqrt(2);
     this.grid = [];
@@ -109,16 +110,18 @@ export default class App {
     this.onWindowResize();
 
     this.renderer.animate(this.render.bind(this));
+    
   }
 
+  triggerPoint(){
+
+  }
+  
   render() {
     this.time += 0.1;
-    // console.log("grid", this.grid.length);
-    for (var total = 0; total < 25; total++) {
+    for (var total = 0; total < 1; total++) {
       if (this.active.length > 0) {
-        // console.log("activeLength", this.active.length);
         let activRandom = Math.floor(Math.random() * this.active.length);
-        // console.log(activRandom);
         let posi = this.active[activRandom];
         var found = false;
         for (let n = 0; n < this.k; n++) {
@@ -128,13 +131,9 @@ export default class App {
           let sample = new THREE.Vector2(offX, offY);
 
           // multiplyScalar
-          // console.log(sample);
           let magnitude = Math.random() * (2 * this.r) + this.r;
-          // console.log("alone", sample, "magnitude", magnitude);
           sample.multiplyScalar(magnitude);
-          // console.log("mag", sample);
           sample.add(posi);
-          // console.log(sample);
           let col = Math.floor(sample.x / this.w);
           let row = Math.floor(sample.y / this.w);
 
@@ -173,11 +172,8 @@ export default class App {
         }
       }
     }
-    console.log(this.ordered);
     // for (let gr = 0; gr < this.grid.length; gr++) {
-    //   // console.log(this.spheres[gr]);
     //   if (this.grid[gr] != -1) {
-    //     // console.log(sphere);
     //     this.spheres[gr].material.wireframe = false;
     //     this.spheres[gr].position.x = this.grid[gr].x / this.k;
     //     this.spheres[gr].position.y = this.grid[gr].y / this.k;
@@ -188,6 +184,15 @@ export default class App {
     //   this.spheres[act].position.x = this.active[act].x;
     //   this.spheres[act].position.y = this.active[act].y;
     // }
+    for (var i = 0; i < this.ordered.length; i++) {
+      if (this.ordered[i]) {
+        // stroke(i % 360, 100, 100);
+        // strokeWeight(r * 0.5);
+        // point(ordered[i].x, ordered[i].y);
+        this.spheres[i].position.x = this.ordered[i].x/2
+        this.spheres[i].position.y = this.ordered[i].y/2
+      }
+    }
     this.renderer.render(this.scene, this.camera);
   }
 
