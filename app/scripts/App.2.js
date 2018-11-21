@@ -5,7 +5,7 @@
 // TODO : add Stats
 
 let OrbitControls = require("three-orbit-controls")(THREE);
-import Geo from "./Geo"
+import Geo from "./Geo";
 
 export default class App {
   constructor() {
@@ -45,7 +45,7 @@ export default class App {
     this.active = [];
     this.ordered = [];
     this.finalConvex = [];
-    this.geos = []
+    this.geos = [];
 
     // STEP 0
     this.cols = Math.floor(this.width / this.w);
@@ -63,11 +63,10 @@ export default class App {
     this.grid[i + j * this.cols] = pos;
     this.active.push(pos);
 
-    
-    this.geos.push(new Geo())
-    this.geos.forEach(geo=>{
+    this.geos.push(new Geo());
+    this.geos.forEach(geo => {
       this.scene.add(geo.mesh);
-    })
+    });
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -144,10 +143,17 @@ export default class App {
       }
     }
 
-
-    this.geos.forEach(geo=>{
-      geo.update(this.ordered,[],this.geos)
-    })
+    this.geos.forEach(geo => {
+      let child = geo.update(
+        this.ordered,
+        this.ordered[this.ordered.length - 1]
+      );
+      if (child.length > 0) {
+        this.geos.push(new Geo(child));
+        this.scene.add(this.geos[this.geos.length - 1].mesh);
+      }
+    });
+    console.log(this.geos);
   }
 
   render() {

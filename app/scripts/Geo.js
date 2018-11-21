@@ -2,12 +2,13 @@ import ch from "geo-convex-hull";
 import vertex from "./shaders/shader.vert";
 import fragment from "./shaders/shader.frag";
 export default class Geo {
-  constructor() {
+  constructor(ownedVertice) {
     this.finalConvex = [];
     this.vert = [];
     this.indice = [];
     this.finalDots = [];
     this.maxVertice = 8;
+    this.ownedVertice = ownedVertice || [];
     this.childDots = [];
 
     let geometry = new THREE.BufferGeometry();
@@ -37,34 +38,34 @@ export default class Geo {
     this.mesh = new THREE.Mesh(geometry, material);
   }
 
-  update(wholeDots, forbidenDots) {
-    this.finalDots = wholeDots.filter(dot => {
-      let unforbiden = true;
-      for (let i = 0; i < forbidenDots.length; i++) {
-        if (dot.x == forbidenDots[i].x && dot.y == forbidenDots[i].y);
-        unforbiden = false;
-      }
-      return unforbiden;
-    });
-    //console.log(wholeDots, this.finalDots);
+  update(wholeDots, lastDot) {
     this.childDots = [];
+    if (this.ownedVertice.length < 1) {
+      this.finalDots = wholeDots;
+    } else {
+      this.finalDots = this.ownedVertice;
+      this.finalDots.push(lastDot);
+    }
+    console.log(this.finalDots)
+    console.log(this.finalDots.length, this.maxVertice);
     if (this.finalDots.length > this.maxVertice) {
       for (let i = 0; i < this.finalDots.length / 2; i++) {
         this.childDots.push(this.finalDots[i]);
         this.finalDots.splice(i, 1);
       }
+      this.ownedVertice = this.finalDots;
     }
 
     this.vert.splice(0, this.vert.length);
 
     this.finalConvex = ch(
-      wholeDots.map(sampl => {
+      this.finalDots.map(sampl => {
         return { latitude: sampl.x / 2, longitude: sampl.y / 2 };
       })
     );
 
     for (var i = 0; i < this.finalConvex.length; i++) {
-      if (wholeDots[i]) {
+      if (this.finalDots[i]) {
         this.vert.push(
           this.finalConvex[i].latitude,
           this.finalConvex[i].longitude,
@@ -87,6 +88,6 @@ export default class Geo {
       new THREE.BufferAttribute(new Uint32Array(this.indice), 1)
     );
 
-    return this.childDots
+    return this.childDots;
   }
 }
