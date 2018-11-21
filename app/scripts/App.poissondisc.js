@@ -21,8 +21,6 @@ export default class App {
       1000
     );
     this.camera.position.z = 200;
-    this.camera.position.y = 5;
-
 
     this.controls = new OrbitControls(this.camera);
     this.controls.enablePan = true;
@@ -73,12 +71,13 @@ export default class App {
     let vertices = new Float32Array(this.vert);
     geometry.addAttribute("position", new THREE.BufferAttribute(vertices, 3));
 
-    this.indice = [];
+    let indice = [];
     for (let a = 1; a < this.vert.length / 3 - 1; a += 1) {
-      this.indice.push(0, a, a + 1);
+      indice.push(0, a, a + 1);
     }
 
-    geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(this.indice), 1));
+    let indices = new Uint32Array(indice);
+    geometry.setIndex(new THREE.BufferAttribute(indices, 1));
 
     let material = new THREE.ShaderMaterial({
       uniforms: {
@@ -90,7 +89,8 @@ export default class App {
     this.mesh = new THREE.Mesh(geometry, material);
     this.scene.add(this.mesh);
 
-
+    this.mesh.geometry.attributes.position.array[0] = Math.sin(this.time) * 0.7;
+    this.mesh.geometry.attributes.position.needsUpdate = true;
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -108,9 +108,7 @@ export default class App {
 
     window.addEventListener("resize", this.onWindowResize.bind(this), false);
     this.onWindowResize();
-    this.triggerPoint()
-    this.triggerPoint()
-    this.triggerPoint()
+
     this.renderer.animate(this.render.bind(this));
     
   }
@@ -168,35 +166,69 @@ export default class App {
       }
     }
   }
-
+  
   render() {
     this.time += 0.1;
-
-    //this.triggerPoint()
-
-    this.mesh.geometry.attributes.position.array[0] = Math.sin(this.time) * 0.7;
-    this.mesh.geometry.attributes.position.needsUpdate = true;
-    //this.vert.push(0, 0, 0);
-    this.vert.splice(0,this.vert.length)
-    // console.log(this.vert);
-    // this.vert.push(1, 1, 0);
-    // this.vert.push(1.5, 1.5, 0);
-    // this.vert.push(1, 1.5, 0);
-
-   // this.mesh.geometry.verticesNeedUpdate = true
+      this.triggerPoint()
+      // if (this.active.length > 0) {
+      //   let activRandom = Math.floor(Math.random() * this.active.length);
+      //   let posi = this.active[activRandom];
+      //   var found = false;
+      //   for (let n = 0; n < this.k; n++) {
+      //     let angle = Math.random() * Math.PI * 2;
+      //     let offX = Math.cos(angle);
+      //     let offY = Math.sin(angle);
+      //     let sample = new THREE.Vector2(offX, offY);
+  
+      //     // multiplyScalar
+      //     let magnitude = Math.random() * (2 * this.r) + this.r;
+      //     sample.multiplyScalar(magnitude);
+      //     sample.add(posi);
+      //     let col = Math.floor(sample.x / this.w);
+      //     let row = Math.floor(sample.y / this.w);
+  
+      //     if (
+      //       col > -1 &&
+      //       row > -1 &&
+      //       col < this.cols &&
+      //       row < this.rows &&
+      //       !this.grid[col + row * this.cols]
+      //     ) {
+      //       let ok = true;
+      //       for (var i = -1; i <= 1; i++) {
+      //         for (var j = -1; j <= 1; j++) {
+      //           var index = col + i + (row + j) * this.cols;
+      //           var neighbor = this.grid[index];
+      //           if (neighbor) {
+      //             var d = sample.distanceTo(neighbor);
+      //             if (d < this.r) {
+      //               ok = false;
+      //             }
+      //           }
+      //         }
+      //       }
+      //       if (ok) {
+      //         found = true;
+      //         this.grid[col + row * this.cols] = sample;
+      //         this.active.push(sample);
+      //         this.ordered.push(sample);
+      //         // Should we break?
+      //         break;
+      //       }
+      //     }
+      //   }
+      //   if (!found) {
+      //     this.active.splice(activRandom, 1);
+      //   }
+      // }
+    
     for (var i = 0; i < this.ordered.length; i++) {
       if (this.ordered[i]) {
-        this.vert.push(this.ordered[i].x/2, this.ordered[i].y/2, 0);
+        
         this.spheres[i].position.x = this.ordered[i].x/2
         this.spheres[i].position.y = this.ordered[i].y/2
       }
     }
-    for (let j = 1; j < this.vert.length / 3 - 1; j += 1) {
-      this.indice.push(0, j, j + 1);
-    }
-    this.mesh.geometry.addAttribute("position", new THREE.BufferAttribute(new Float32Array(this.vert), 3));
-    this.mesh.geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(this.indice), 1));
-    
     this.renderer.render(this.scene, this.camera);
   }
 

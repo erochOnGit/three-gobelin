@@ -5,6 +5,7 @@
 // TODO : add Stats
 
 let OrbitControls = require("three-orbit-controls")(THREE);
+
 export default class App {
   constructor() {
     this.container = document.querySelector("#main");
@@ -89,6 +90,7 @@ export default class App {
       vert.push(Math.random() * 2 - 1);
       vert.push(0);
     }
+
     let vertices = new Float32Array(vert);
     geometry.addAttribute("position", new THREE.BufferAttribute(vertices, 3));
     let indices = new Uint32Array([0, 1, 2, 0, 3, 4, 1, 4, 5]);
