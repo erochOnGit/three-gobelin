@@ -7,7 +7,7 @@ export default class Geo {
     this.vert = [];
     this.indice = [];
     this.finalDots = [];
-    this.maxVertice = 8;
+    this.maxVertice = 7;
     this.ownedVertice = ownedVertice || [];
     this.childDots = [];
 
@@ -46,8 +46,10 @@ export default class Geo {
       this.finalDots = this.ownedVertice;
       this.finalDots.push(lastDot);
     }
-    console.log(this.finalDots)
-    console.log(this.finalDots.length, this.maxVertice);
+
+    if(this.finalDots.length> this.maxVertice){
+      console.log("mitose")
+    }
     if (this.finalDots.length > this.maxVertice) {
       for (let i = 0; i < this.finalDots.length / 2; i++) {
         this.childDots.push(this.finalDots[i]);
@@ -55,7 +57,8 @@ export default class Geo {
       }
       this.ownedVertice = this.finalDots;
     }
-
+    console.log(this.finalDots)
+    
     this.vert.splice(0, this.vert.length);
 
     this.finalConvex = ch(
@@ -76,7 +79,7 @@ export default class Geo {
         // this.spheres[i].position.y = this.finalConvex[i].longitude;
       }
     }
-
+console.log("this.vert.length",this.vert.length)
     for (let j = 1; j < this.vert.length / 3 - 1; j += 1) {
       this.indice.push(0, j, j + 1);
     }
