@@ -114,81 +114,117 @@ export default class App {
   }
 
   triggerPoint(){
+    if (this.active.length > 0) {
+      let activRandom = Math.floor(Math.random() * this.active.length);
+      let posi = this.active[activRandom];
+      var found = false;
+      for (let n = 0; n < this.k; n++) {
+        let angle = Math.random() * Math.PI * 2;
+        let offX = Math.cos(angle);
+        let offY = Math.sin(angle);
+        let sample = new THREE.Vector2(offX, offY);
 
+        // multiplyScalar
+        let magnitude = Math.random() * (2 * this.r) + this.r;
+        sample.multiplyScalar(magnitude);
+        sample.add(posi);
+        let col = Math.floor(sample.x / this.w);
+        let row = Math.floor(sample.y / this.w);
+
+        if (
+          col > -1 &&
+          row > -1 &&
+          col < this.cols &&
+          row < this.rows &&
+          !this.grid[col + row * this.cols]
+        ) {
+          let ok = true;
+          for (var i = -1; i <= 1; i++) {
+            for (var j = -1; j <= 1; j++) {
+              var index = col + i + (row + j) * this.cols;
+              var neighbor = this.grid[index];
+              if (neighbor) {
+                var d = sample.distanceTo(neighbor);
+                if (d < this.r) {
+                  ok = false;
+                }
+              }
+            }
+          }
+          if (ok) {
+            found = true;
+            this.grid[col + row * this.cols] = sample;
+            this.active.push(sample);
+            this.ordered.push(sample);
+            // Should we break?
+            break;
+          }
+        }
+      }
+      if (!found) {
+        this.active.splice(activRandom, 1);
+      }
+    }
   }
   
   render() {
     this.time += 0.1;
-    for (var total = 0; total < 1; total++) {
-      if (this.active.length > 0) {
-        let activRandom = Math.floor(Math.random() * this.active.length);
-        let posi = this.active[activRandom];
-        var found = false;
-        for (let n = 0; n < this.k; n++) {
-          let angle = Math.random() * Math.PI * 2;
-          let offX = Math.cos(angle);
-          let offY = Math.sin(angle);
-          let sample = new THREE.Vector2(offX, offY);
-
-          // multiplyScalar
-          let magnitude = Math.random() * (2 * this.r) + this.r;
-          sample.multiplyScalar(magnitude);
-          sample.add(posi);
-          let col = Math.floor(sample.x / this.w);
-          let row = Math.floor(sample.y / this.w);
-
-          if (
-            col > -1 &&
-            row > -1 &&
-            col < this.cols &&
-            row < this.rows &&
-            !this.grid[col + row * this.cols]
-          ) {
-            let ok = true;
-            for (var i = -1; i <= 1; i++) {
-              for (var j = -1; j <= 1; j++) {
-                var index = col + i + (row + j) * this.cols;
-                var neighbor = this.grid[index];
-                if (neighbor) {
-                  var d = sample.distanceTo(neighbor);
-                  if (d < this.r) {
-                    ok = false;
-                  }
-                }
-              }
-            }
-            if (ok) {
-              found = true;
-              this.grid[col + row * this.cols] = sample;
-              this.active.push(sample);
-              this.ordered.push(sample);
-              // Should we break?
-              break;
-            }
-          }
-        }
-        if (!found) {
-          this.active.splice(activRandom, 1);
-        }
-      }
-    }
-    // for (let gr = 0; gr < this.grid.length; gr++) {
-    //   if (this.grid[gr] != -1) {
-    //     this.spheres[gr].material.wireframe = false;
-    //     this.spheres[gr].position.x = this.grid[gr].x / this.k;
-    //     this.spheres[gr].position.y = this.grid[gr].y / this.k;
-    //   }
-    // }
-    // for (let act = 0; act < this.active.length; act++) {
-    //   this.spheres[act].material.opacity = 0.5;
-    //   this.spheres[act].position.x = this.active[act].x;
-    //   this.spheres[act].position.y = this.active[act].y;
-    // }
+      this.triggerPoint()
+      // if (this.active.length > 0) {
+      //   let activRandom = Math.floor(Math.random() * this.active.length);
+      //   let posi = this.active[activRandom];
+      //   var found = false;
+      //   for (let n = 0; n < this.k; n++) {
+      //     let angle = Math.random() * Math.PI * 2;
+      //     let offX = Math.cos(angle);
+      //     let offY = Math.sin(angle);
+      //     let sample = new THREE.Vector2(offX, offY);
+  
+      //     // multiplyScalar
+      //     let magnitude = Math.random() * (2 * this.r) + this.r;
+      //     sample.multiplyScalar(magnitude);
+      //     sample.add(posi);
+      //     let col = Math.floor(sample.x / this.w);
+      //     let row = Math.floor(sample.y / this.w);
+  
+      //     if (
+      //       col > -1 &&
+      //       row > -1 &&
+      //       col < this.cols &&
+      //       row < this.rows &&
+      //       !this.grid[col + row * this.cols]
+      //     ) {
+      //       let ok = true;
+      //       for (var i = -1; i <= 1; i++) {
+      //         for (var j = -1; j <= 1; j++) {
+      //           var index = col + i + (row + j) * this.cols;
+      //           var neighbor = this.grid[index];
+      //           if (neighbor) {
+      //             var d = sample.distanceTo(neighbor);
+      //             if (d < this.r) {
+      //               ok = false;
+      //             }
+      //           }
+      //         }
+      //       }
+      //       if (ok) {
+      //         found = true;
+      //         this.grid[col + row * this.cols] = sample;
+      //         this.active.push(sample);
+      //         this.ordered.push(sample);
+      //         // Should we break?
+      //         break;
+      //       }
+      //     }
+      //   }
+      //   if (!found) {
+      //     this.active.splice(activRandom, 1);
+      //   }
+      // }
+    
     for (var i = 0; i < this.ordered.length; i++) {
       if (this.ordered[i]) {
-        // stroke(i % 360, 100, 100);
-        // strokeWeight(r * 0.5);
-        // point(ordered[i].x, ordered[i].y);
+        
         this.spheres[i].position.x = this.ordered[i].x/2
         this.spheres[i].position.y = this.ordered[i].y/2
       }
