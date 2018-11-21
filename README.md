@@ -13,3 +13,5 @@
 
 shiffman : https://github.com/CodingTrain/website/blob/master/CodingChallenges/CC_033_poisson_disc/P5/sketch.js
 https://www.youtube.com/watch?v=flQgnCUxHlw
+
+three : https://threejs.org/examples/webgl_geometry_extrude_shapes2.html
