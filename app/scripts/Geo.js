@@ -26,7 +26,7 @@ export default class Geo {
 
     this.indice = [];
     for (let a = 1; a < this.vert.length / 3 - 1; a += 1) {
-      this.indice.push(0, a, a + 1);
+      this.indice.push(0, a, a+1 );
     }
 
     geometry.setIndex(
@@ -63,41 +63,65 @@ export default class Geo {
     });
     return bigger;
   }
-  update(wholeDots, lastDot) {
+  update(wholeDots, lastDot, scene) {
     this.childDots = [];
-
     if (this.ownedVertice.length < 1) {
       this.finalDots = wholeDots;
     } else {
       this.finalDots = this.ownedVertice;
-      console.log("this.minVerticeX", this.minVerticeX, "lastDot", lastDot);
-      console.log(lastDot)
-      if (this.minVerticeX && lastDot.x > this.minVerticeX) {
+      if (this.finalDots[this.finalDots.length - 1] == lastDot) {
+        this.finalDots.pop();
+      }
+      console.log(
+        "this.ownedVertice",
+        this.ownedVertice,
+        "this.minVerticeX",
+        this.minVerticeX,
+        "lastDot",
+        lastDot.x,
+        "finaldots",
+        this.finalDots[this.finalDots.length - 1].x
+      );
+      if (this.minVerticeX && lastDot.x < this.minVerticeX) {
         console.log("trop petit");
-      } else if (this.maxVerticeX && lastDot.x < this.maxVerticeX) {
+      } else if (this.maxVerticeX && lastDot.x > this.maxVerticeX) {
         console.log("trop grand");
       } else {
+        console.log("added anyway");
         this.finalDots.push(lastDot);
       }
     }
 
+    console.log("finaldots", this.finalDots);
+
     if (this.finalDots.length > this.maxVertice) {
-      console.log("finaldots",this.finalDots.length,"maxVertice",this.maxVertice);
+      console.log(
+        "finaldotslength",
+        this.finalDots.length,
+        "maxVertice",
+        this.maxVertice
+      );
     }
-    if (this.finalDots.length > this.maxVertice-1) {
+    if (this.finalDots.length > this.maxVertice - 1) {
       this.childMoy = this.moyenne(
         this.finalDots.map(dot => {
           return dot.x;
         })
       );
-console.log("moy",this.childMoy)
-let removedDot = 0;
-      for (let i = 0; i < this.finalDots.length+removedDot; i++) {
-        console.log(i,this.finalDots.length)
-        if (this.finalDots[i-removedDot].x < this.childMoy) {
-          this.childDots.push(this.finalDots[i-removedDot]);
-          this.finalDots.splice(i-removedDot, 1);
-          removedDot++
+      //       var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+      // var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+      // var cube = new THREE.Mesh( geometry, material );
+      // cube.position.x = this.childMoy
+      // cube.scale.y = 100;
+      //       scene.add(cube)
+      //console.log("moy",this.childMoy)
+
+      let removedDot = 0;
+      for (let i = 0; i < this.finalDots.length + removedDot; i++) {
+        if (this.finalDots[i - removedDot].x < this.childMoy) {
+          this.childDots.push(this.finalDots[i - removedDot]);
+          this.finalDots.splice(i - removedDot, 1);
+          removedDot++;
         }
       }
       this.mesh.material.uniforms.color.value = new THREE.Color(0xdd88a5);
@@ -123,7 +147,7 @@ let removedDot = 0;
         );
       }
     }
-    console.log("this.vert.length", this.vert.length);
+    //console.log("this.vert.length", this.vert.length);
     for (let j = 1; j < this.vert.length / 3 - 1; j += 1) {
       this.indice.push(0, j, j + 1);
     }

@@ -134,6 +134,20 @@ export default class App {
             this.active.push(sample);
             this.ordered.push(sample);
             // Should we break? (shiffman comment)
+            console.log("--------------------------------------------------");
+            console.log(this.ordered,this.ordered[this.ordered.length - 1]);
+            
+            this.geos.forEach(geo => {
+              let child = geo.update(
+                this.ordered,
+                this.ordered[this.ordered.length - 1],
+                this.scene
+              );
+              if (child.length > 0) {
+                this.geos.push(new Geo(child));
+                this.scene.add(this.geos[this.geos.length - 1].mesh);
+              }
+            });
             break;
           }
         }
@@ -143,23 +157,13 @@ export default class App {
       }
     }
 
-    this.geos.forEach(geo => {
-      let child = geo.update(
-        this.ordered,
-        this.ordered[this.ordered.length - 1]
-      );
-      if (child.length > 0) {
-        this.geos.push(new Geo(child));
-        this.scene.add(this.geos[this.geos.length - 1].mesh);
-      }
-    });
     console.log(this.geos);
   }
 
   render() {
     this.time += 0.1;
 
-    //this.triggerPoint()
+    this.triggerPoint()
 
     this.renderer.render(this.scene, this.camera);
   }
