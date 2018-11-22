@@ -74,7 +74,7 @@ export default class App {
     this.container.appendChild(this.renderer.domElement);
 
     this.spheres = [];
-    for (let l = 0; l < this.grid.length; l++) {
+    for (let l = 0; l < 2; l++) {
       let circleGeometry = new THREE.SphereGeometry(0.2, 32, 32);
       let circleMaterial = new THREE.MeshNormalMaterial({ wireframe: true });
       let circleMesh = new THREE.Mesh(circleGeometry, circleMaterial);
@@ -133,7 +133,7 @@ export default class App {
             this.grid[col + row * this.cols] = sample;
             this.active.push(sample);
             this.ordered.push(sample);
-            // Should we break?
+            // Should we break? (shiffman comment)
             break;
           }
         }
