@@ -17,7 +17,7 @@ export default class App {
       70,
       window.innerWidth / window.innerHeight,
       0.1,
-      1000
+      2000
     );
     this.camera.position.z = 200;
     this.camera.position.y = 5;
@@ -38,7 +38,7 @@ export default class App {
 
     this.width = 80;
     this.height = 80;
-    this.r = 3;
+    this.r = 2;
     this.k = 30; //quitTrial
     this.w = this.r / Math.sqrt(2);
     this.grid = [];
@@ -134,8 +134,8 @@ export default class App {
             this.active.push(sample);
             this.ordered.push(sample);
             // Should we break? (shiffman comment)
-            console.log("--------------------------------------------------");
-            console.log(this.ordered,this.ordered[this.ordered.length - 1]);
+            // console.log("--------------------------------------------------");
+            // console.log(this.ordered,this.ordered[this.ordered.length - 1]);
             
             this.geos.forEach(geo => {
               let child = geo.update(
@@ -157,7 +157,7 @@ export default class App {
       }
     }
 
-    console.log(this.geos);
+    // console.log(this.geos);
   }
 
   render() {

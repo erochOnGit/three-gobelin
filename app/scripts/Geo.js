@@ -26,21 +26,40 @@ export default class Geo {
 
     this.indice = [];
     for (let a = 1; a < this.vert.length / 3 - 1; a += 1) {
-      this.indice.push(0, a, a+1 );
+      this.indice.push(0, a, a + 1);
     }
 
     geometry.setIndex(
       new THREE.BufferAttribute(new Uint32Array(this.indice), 1)
     );
 
-    let material = new THREE.ShaderMaterial({
+    this.shape = new THREE.Shape();
+    this.shape.moveTo(this.vert[0], this.vert[1]);
+    for (let s = 0; s < this.vert.length; s += 3) {
+      this.shape.lineTo(this.vert[s], this.vert[s + 1]);
+    }
+    this.shape.lineTo(this.vert[0], this.vert[1]);
+    this.extrudeSettings = {
+      steps: 2,
+      depth: 16,
+      bevelEnabled: true,
+      bevelThickness: 1,
+      bevelSize: 1,
+      bevelSegments: 1
+    };
+    this.geometry2 = new THREE.ExtrudeBufferGeometry(
+      this.shape,
+      this.extrudeSettings
+    );
+
+    this.material = new THREE.ShaderMaterial({
       uniforms: {
         color: { value: new THREE.Color(0x0000ff) }
       },
       vertexShader: vertex,
       fragmentShader: fragment
     });
-    this.mesh = new THREE.Mesh(geometry, material);
+    this.mesh = new THREE.Mesh(this.geometry2, this.material);
   }
   moyenne(numbers) {
     let total = 0;
@@ -72,27 +91,27 @@ export default class Geo {
       if (this.finalDots[this.finalDots.length - 1] == lastDot) {
         this.finalDots.pop();
       }
-      console.log(
-        "this.ownedVertice",
-        this.ownedVertice,
-        "this.minVerticeX",
-        this.minVerticeX,
-        "lastDot",
-        lastDot.x,
-        "finaldots",
-        this.finalDots[this.finalDots.length - 1].x
-      );
+      //  console.log(
+      //   "this.ownedVertice",
+      //   this.ownedVertice,
+      //   "this.minVerticeX",
+      //   this.minVerticeX,
+      //   "lastDot",
+      //   lastDot.x,
+      //   "finaldots",
+      //   this.finalDots[this.finalDots.length - 1].x
+      // );
       if (this.minVerticeX && lastDot.x < this.minVerticeX) {
-        console.log("trop petit");
+        // console.log("trop petit");
       } else if (this.maxVerticeX && lastDot.x > this.maxVerticeX) {
-        console.log("trop grand");
+        // console.log("trop grand");
       } else {
-        console.log("added anyway");
+        // console.log("added anyway");
         this.finalDots.push(lastDot);
       }
     }
 
-    console.log("finaldots", this.finalDots);
+    // console.log("finaldots", this.finalDots);
 
     if (this.finalDots.length > this.maxVertice) {
       console.log(
@@ -151,13 +170,57 @@ export default class Geo {
     for (let j = 1; j < this.vert.length / 3 - 1; j += 1) {
       this.indice.push(0, j, j + 1);
     }
+
+    // shape.lineTo( 0, width );
+    // shape.lineTo( length, width );
+    // shape.lineTo( length, 0 );
+    // shape.lineTo( 0, 0 );
+
     this.mesh.geometry.addAttribute(
       "position",
       new THREE.BufferAttribute(new Float32Array(this.vert), 3)
     );
+
     this.mesh.geometry.setIndex(
       new THREE.BufferAttribute(new Uint32Array(this.indice), 1)
     );
+
+    this.shape = new THREE.Shape();
+    this.shape.moveTo(this.vert[0], this.vert[1]);
+    for (let s = 0; s < this.vert.length; s += 3) {
+      this.shape.lineTo(this.vert[s], this.vert[s + 1]);
+    }
+    this.shape.lineTo(this.vert[0], this.vert[1]);
+
+    this.extrudeSettings = {
+      steps: 1,
+      depth: .01,
+      bevelEnabled: true,
+      bevelThickness: 5,
+      bevelSize: 5,
+      bevelSegments: 5
+    };
+    //console.log(this.shape);
+
+    if(this.shape.curves.length>3){
+
+    this.geometry2 = new THREE.ExtrudeBufferGeometry(
+      this.shape,
+      this.extrudeSettings
+    );
+
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        color: { value: new THREE.Color(0x0000ff) }
+      },
+      vertexShader: vertex,
+      fragmentShader: fragment
+    });
+
+    this.mesh.geometry = this.geometry2
+//    console.log(this.mesh)
+    //this.mesh = new THREE.Mesh(this.geometry2, this.material);
+  }
 
     return this.childDots;
   }
