@@ -13,6 +13,7 @@ export default class Geo {
     refractionCube,
     reflectionCube
   ) {
+    this.time = 0;
     this.texture = texture;
     this.textureNormal = textureNormal;
     this.textureDisp = textureDisp;
@@ -35,9 +36,15 @@ export default class Geo {
       : null;
 
     let geometry = new THREE.BufferGeometry();
-    this.vert.push(0, 0, 0);
-    this.vert.push(0.5, 0.5, 0);
-    this.vert.push(0, 0.5, 0);
+    if(this.ownedVertice && this.ownedVertice.length>0){
+      for (let i = 0; i < this.ownedVertice.length; i++) {
+       this.vert.push(this.ownedVertice[i].x,this.ownedVertice[i].y,0)
+      }
+    }else{
+      this.vert.push(0, 0, 0);
+      this.vert.push(0.5, 0.5, 0);
+      this.vert.push(0, 0.5, 0);
+    }
 
     let vertices = new Float32Array(this.vert);
     geometry.addAttribute("position", new THREE.BufferAttribute(vertices, 3));
@@ -58,12 +65,12 @@ export default class Geo {
     }
     this.shape.lineTo(this.vert[0], this.vert[1]);
     this.extrudeSettings = {
-      steps: 2,
-      depth: 2,
+      steps: 10,
+      amount: 5,
       bevelEnabled: true,
-      bevelThickness: 1,
-      bevelSize: 1,
-      bevelSegments: 1
+      bevelThickness: 5,
+      bevelSize: 0.1,
+      bevelSegments: 5
     };
     this.geometry2 = new THREE.ExtrudeBufferGeometry(
       this.shape,
@@ -97,7 +104,7 @@ export default class Geo {
     });
     // var cubeMaterial2
     this.material = new THREE.MeshLambertMaterial({
-      color: 0xffee00,
+      color: 0xff00ee,
       envMap: this.refractionCube,
       refractionRatio: 0.95
     });
@@ -111,7 +118,8 @@ export default class Geo {
 
     this.mesh = new THREE.Mesh(this.geometry2, this.material);
     this.mesh.rotation.x = 5;
-    // this.mesh.rotation.y = Math.random() * 0.7;
+    this.mesh.rotation.y = Math.random() * 10;
+    
   }
   moyenne(numbers) {
     let total = 0;
@@ -135,6 +143,7 @@ export default class Geo {
     return bigger;
   }
   update(wholeDots, lastDot, scene) {
+    this.time++
     this.childDots = [];
     if (this.ownedVertice.length < 1) {
       this.finalDots = wholeDots;
@@ -246,11 +255,11 @@ export default class Geo {
 
     this.extrudeSettings = {
       steps: 10,
-      depth: 5,
+      amount: Math.floor(this.time /5) +0.1,
       bevelEnabled: true,
-      bevelThickness: 10,
-      bevelSize: 10,
-      bevelSegments: 10
+      bevelThickness: Math.floor(this.time /10) +0.1,
+      bevelSize: Math.floor(this.time /10) +0.1,
+      bevelSegments: 5
     };
     //console.log(this.shape);
 
@@ -269,7 +278,8 @@ export default class Geo {
       // });
 
       this.mesh.geometry = this.geometry2;
-
+      this.mesh.position.x = this.mesh.position.x + Math.cos(this.time/200) 
+      this.mesh.position.y = this.mesh.position.y + Math.cos(this.time/200) 
       //    console.log(this.mesh)
       //this.mesh = new THREE.Mesh(this.geometry2, this.material);
     }

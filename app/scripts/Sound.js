@@ -214,6 +214,7 @@ export default class Sound {
   }
 
   // sound analyser
+
   getSpectrum() {
     this.analyserNode.getByteFrequencyData(this.frequencyDataArray);
 

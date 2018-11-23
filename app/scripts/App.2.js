@@ -6,12 +6,17 @@
 
 let OrbitControls = require("three-orbit-controls")(THREE);
 import Geo from "./Geo";
+import Sound from "./Sound.js";
 
 import saphyr from "../../assets/textures/saphir/Sapphire_001_COLOR.jpg";
 import saphyrNormal from "../../assets/textures/saphir/Sapphire_001_NORM.jpg";
 import saphyrDisp from "../../assets/textures/saphir/Sapphire_001_DISP.png";
 import saphyrRough from "../../assets/textures/saphir/Sapphire_001_ROUGH.jpg";
 import saphyrOcclusion from "../../assets/textures/saphir/Sapphire_001_OCC.jpg";
+
+import musicGourmet from "../../assets/musics/GourmetRace.mp3";
+import musicNaruto from "../../assets/musics/Naruto.mp3";
+import musicZelda from "../../assets/musics/Zelda.mp3";
 
 import n from "../../assets/skybox/sky-partieHaute.png";
 import e from "../../assets/skybox/sky-partieDroite1.png";
@@ -23,6 +28,21 @@ import c from "../../assets/skybox/sky-centre.png";
 export default class App {
   constructor() {
     this.time = 0;
+    let musics = [
+      musicGourmet,
+      // musicNaruto
+      // musicZelda
+    ];
+    this.sound = new Sound(
+      musics[Math.floor(Math.random() * musics.length)],
+      140,
+      0,
+      () => {
+        this.sound.play(), true;
+      },
+      true
+    );
+    
     this.container = document.querySelector("#main");
     document.body.appendChild(this.container);
 
@@ -30,7 +50,7 @@ export default class App {
       70,
       window.innerWidth / window.innerHeight,
       0.1,
-      2000
+      5000
     );
     this.camera.position.z = 200;
     this.camera.position.y = 5;
@@ -112,7 +132,7 @@ export default class App {
     //   path + "nz" + format
     // ];
 
-    var urls = [ e,w, n, s,  c,e2];
+    var urls = [e, w, n, s, c, e2];
 
     this.reflectionCube = new THREE.CubeTextureLoader().load(urls);
     this.reflectionCube.format = THREE.RGBFormat;
@@ -146,6 +166,18 @@ export default class App {
     this.triggerPoint();
     this.triggerPoint();
     this.triggerPoint();
+    this.kick = this.sound.createKick({
+      frequency: [0, 10],
+      threshold: 250,
+      decay: 1,
+      onKick: () => {this.triggerPoint();
+         //this.triggerPoint();
+      // this.camera.position.x += Math.cos(this.time/10)
+      // this.camera.position.y += Math.sin(this.time/10)
+      this.camera.position.z += Math.sin(this.time)*10+1
+      },
+      offKick: () => {}
+    }).on()
     this.renderer.animate(this.render.bind(this));
   }
 
@@ -233,8 +265,7 @@ export default class App {
   render() {
     this.time += 0.1;
 
-    this.triggerPoint();
-
+ 
     this.renderer.render(this.scene, this.camera);
   }
 
