@@ -112,7 +112,7 @@ export default class App {
     //   path + "nz" + format
     // ];
 
-    var urls = [n, c, w, s, e, e2];
+    var urls = [ e,w, n, s,  c,e2];
 
     this.reflectionCube = new THREE.CubeTextureLoader().load(urls);
     this.reflectionCube.format = THREE.RGBFormat;
