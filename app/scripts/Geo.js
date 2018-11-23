@@ -1,8 +1,26 @@
 import ch from "geo-convex-hull";
 import vertex from "./shaders/shader.vert";
 import fragment from "./shaders/shader.frag";
+
 export default class Geo {
-  constructor(ownedVertice) {
+  constructor(
+    ownedVertice,
+    texture,
+    textureNormal,
+    textureDisp,
+    textureRough,
+    textureOcclusion,
+    refractionCube,
+    reflectionCube
+  ) {
+    this.texture = texture;
+    this.textureNormal = textureNormal;
+    this.textureDisp = textureDisp;
+    this.textureRough = textureRough;
+    this.textureOcclusion = textureOcclusion;
+    this.refractionCube = refractionCube;
+    this.reflectionCube = reflectionCube;
+
     this.finalConvex = [];
     this.vert = [];
     this.indice = [];
@@ -41,7 +59,7 @@ export default class Geo {
     this.shape.lineTo(this.vert[0], this.vert[1]);
     this.extrudeSettings = {
       steps: 2,
-      depth: 16,
+      depth: 2,
       bevelEnabled: true,
       bevelThickness: 1,
       bevelSize: 1,
@@ -52,14 +70,48 @@ export default class Geo {
       this.extrudeSettings
     );
 
-    this.material = new THREE.ShaderMaterial({
-      uniforms: {
-        color: { value: new THREE.Color(0x0000ff) }
-      },
-      vertexShader: vertex,
-      fragmentShader: fragment
+    // this.material = new THREE.MeshPhongMaterial({
+    //   // color: 0x00ff00,
+    //   // emissive: 0x00ff00,
+    //   map: this.texture,
+    //   normalMap: this.textureNormal,
+    //   displacementMap: this.textureDisp,
+    //   aoMap: this.textureOcclusion,
+    //   // lightMap: textureMask,
+    //   specular: 0xffffff,
+    //   specularMap: this.textureRough,
+    //   lightMapIntensity: 5,
+
+    //   //wireframe: true,
+    //   aoMapIntensity: 5,
+    //   emissiveIntensity: 5,
+    //   displacementScale: 0.05
+    // });
+
+    //materials
+    var cubeMaterial3 = new THREE.MeshLambertMaterial({
+      color: 0xff6600,
+      envMap: this.reflectionCube,
+      combine: THREE.MixOperation,
+      reflectivity: 0.3
     });
+    // var cubeMaterial2
+    this.material = new THREE.MeshLambertMaterial({
+      color: 0xffee00,
+      envMap: this.refractionCube,
+      refractionRatio: 0.95
+    });
+    var cubeMaterial1 = new THREE.MeshLambertMaterial({
+      color: 0xffffff,
+      envMap: this.reflectionCube
+    });
+
+    // this.material.transparent = true;
+    // this.material.opacity = 0.7;
+
     this.mesh = new THREE.Mesh(this.geometry2, this.material);
+    this.mesh.rotation.x = 5;
+    // this.mesh.rotation.y = Math.random() * 0.7;
   }
   moyenne(numbers) {
     let total = 0;
@@ -143,7 +195,7 @@ export default class Geo {
           removedDot++;
         }
       }
-      this.mesh.material.uniforms.color.value = new THREE.Color(0xdd88a5);
+      //this.mesh.material.uniforms.color.value = new THREE.Color(0xdd88a5);
       this.minVerticeX = this.smaller(this.finalDots.map(dot => dot.x));
       this.ownedVertice = this.finalDots;
     }
@@ -193,34 +245,34 @@ export default class Geo {
     this.shape.lineTo(this.vert[0], this.vert[1]);
 
     this.extrudeSettings = {
-      steps: 1,
-      depth: .01,
+      steps: 10,
+      depth: 5,
       bevelEnabled: true,
-      bevelThickness: 5,
-      bevelSize: 5,
-      bevelSegments: 5
+      bevelThickness: 10,
+      bevelSize: 10,
+      bevelSegments: 10
     };
     //console.log(this.shape);
 
-    if(this.shape.curves.length>3){
+    if (this.shape.curves.length > 3) {
+      this.geometry2 = new THREE.ExtrudeBufferGeometry(
+        this.shape,
+        this.extrudeSettings
+      );
 
-    this.geometry2 = new THREE.ExtrudeBufferGeometry(
-      this.shape,
-      this.extrudeSettings
-    );
+      // this.material = new THREE.ShaderMaterial({
+      //   uniforms: {
+      //     color: { value: new THREE.Color(0x0000ff) }
+      //   },
+      //   vertexShader: vertex,
+      //   fragmentShader: fragment
+      // });
 
-    this.material = new THREE.ShaderMaterial({
-      uniforms: {
-        color: { value: new THREE.Color(0x0000ff) }
-      },
-      vertexShader: vertex,
-      fragmentShader: fragment
-    });
+      this.mesh.geometry = this.geometry2;
 
-    this.mesh.geometry = this.geometry2
-//    console.log(this.mesh)
-    //this.mesh = new THREE.Mesh(this.geometry2, this.material);
-  }
+      //    console.log(this.mesh)
+      //this.mesh = new THREE.Mesh(this.geometry2, this.material);
+    }
 
     return this.childDots;
   }
